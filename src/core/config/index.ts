@@ -6,6 +6,7 @@ export enum Env {
 }
 
 export interface AppConfig {
+  NAME: string;
   PORT: string | number;
   BASE_URL: string;
   NODE_ENV: string;

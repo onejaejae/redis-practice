@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "start": "NODE_ENV=local nest start",
+    "start": "NODE_ENV=local nest start --watch",
     "test": "jest",
     "docker:up": "docker compose -f docker-compose.local.yml up --build -d",
     "docker:down": "docker compose -f docker-compose.local.yml down",
@@ -23,12 +23,14 @@
     "@nestjs/typeorm": "^11.0.0",
     "class-transformer": "^0.5.1",
     "mysql2": "^3.14.1",
+    "nest-winston": "^1.10.2",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "typeorm": "^0.3.24",
     "typeorm-extension": "^3.7.1",
     "typeorm-naming-strategies": "^4.1.0",
-    "typeorm-transactional": "^0.5.0"
+    "typeorm-transactional": "^0.5.0",
+    "winston": "^3.17.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
