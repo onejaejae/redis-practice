@@ -13,6 +13,11 @@ export interface AppConfig {
   ENV: Env;
 }
 
+export interface RedisConfig {
+  HOST: string;
+  PORT: number | string;
+}
+
 export interface DBConfig {
   DB_HOST: string;
   DB_USER_NAME: string;
@@ -24,4 +29,5 @@ export interface DBConfig {
 export interface Configurations {
   APP: AppConfig;
   DB: DBConfig;
+  REDIS: RedisConfig;
 }
