@@ -10,11 +10,18 @@ export class CacheService {
   }
 
   public async get(key: string): Promise<string | null> {
-    return this.redis.get(key);
+    const data = await this.redis.get(key);
+    if (data) {
+      return JSON.parse(data);
+    }
+
+    return null;
   }
 
   public async set(key: string, value: any, ttl?: number) {
-    await this.redis.set(key, value);
+    const serializedValue = JSON.stringify(value);
+
+    await this.redis.set(key, serializedValue);
     await this.setTTL(key, ttl);
   }
 
