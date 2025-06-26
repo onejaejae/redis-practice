@@ -5,6 +5,7 @@ export const RedisClientKey = Symbol('RedisClientKey');
 
 export const CacheKeys = {
   User: 'user/',
+  UserRank: 'user-rank/',
 } as const;
 export type CacheKeys = Union<typeof CacheKeys>;
 

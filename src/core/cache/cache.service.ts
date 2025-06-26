@@ -28,4 +28,18 @@ export class CacheService {
   public async del(key: string) {
     await this.redis.del(key);
   }
+
+  public async zadd(key: string, score: number, value: string) {
+    return this.redis.zadd(key, score, value);
+  }
+
+  public async zrevrank(key: string, value: string): Promise<number | null> {
+    const rank = await this.redis.zrevrank(key, value);
+
+    return rank !== null ? rank + 1 : null;
+  }
+
+  public async zrevrange(key: string, start: number, end: number) {
+    return this.redis.zrevrange(key, start, end);
+  }
 }
