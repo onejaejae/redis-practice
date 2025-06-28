@@ -1,10 +1,16 @@
 import { User } from 'src/entities/user/user.entity';
 import { DataSource } from 'typeorm';
 import { Seeder } from 'typeorm-extension';
+import { Redis } from 'ioredis';
+import { CacheKeys } from 'src/core/cache/cache.interface';
 
 export default class UserSeeder implements Seeder {
   public async run(dataSource: DataSource): Promise<void> {
     const userRepository = dataSource.getRepository(User);
+    const redis = new Redis({
+      port: 6379,
+      host: '127.0.0.1',
+    });
 
     const users: Partial<User>[] = [
       {
@@ -110,5 +116,9 @@ export default class UserSeeder implements Seeder {
 
     // Save the created entities
     await userRepository.save(userEntities);
+
+    for (const user of userEntities) {
+      await redis.zadd(CacheKeys.UserRank, user.score ?? 0, user.id ?? '');
+    }
   }
 }
