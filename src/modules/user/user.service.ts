@@ -5,12 +5,14 @@ import { CacheKeys } from 'src/core/cache/cache.interface';
 import { Cache } from 'src/core/cache/cache.decorator';
 import { RankService } from '../rank/rank.service';
 import { GetUsersByRankDto } from './dto/request/getUsersByRank.dto';
+import { LoggerService } from 'src/core/logger/logger.service';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly rankService: RankService,
     private readonly userRepository: UserRepository,
+    private readonly loggerService: LoggerService,
   ) {}
 
   @Cache({ key: CacheKeys.User, ttl: 60 })
@@ -21,7 +23,17 @@ export class UserService {
   }
 
   async getUserRank(userId: User['id']) {
-    return this.rankService.getUserRank(userId);
+    try {
+      return this.rankService.getUserRank(userId);
+    } catch (error) {
+      this.loggerService.error(
+        this.getUserRank.name,
+        error,
+        'get user rank error from redis',
+      );
+
+      return this.userRepository.getUserRank(userId);
+    }
   }
 
   async getUsersByRank(query: GetUsersByRankDto) {
