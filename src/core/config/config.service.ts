@@ -1,6 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AppConfig, Configurations, DBConfig, RedisConfig } from '.';
+import {
+  AppConfig,
+  Configurations,
+  DBConfig,
+  MongoDBConfig,
+  RedisConfig,
+} from '.';
 
 @Injectable()
 export class MoinConfigService {
@@ -12,6 +18,10 @@ export class MoinConfigService {
 
   getDBConfig(): DBConfig {
     return this.configService.getOrThrow('DB');
+  }
+
+  getMongoDBConfig(): MongoDBConfig {
+    return this.configService.getOrThrow('MONGODB');
   }
 
   getRedisConfig(): RedisConfig {

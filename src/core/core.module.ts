@@ -6,6 +6,7 @@ import { ErrorInterceptor } from './interceptor/error.interceptor';
 import { TypeOrmModule } from './database/typeorm/typeorm.module';
 import { LoggerModule } from './logger/logger.module';
 import { CacheModule } from './cache/cache.module';
+import { MongooseModule } from './database/mongoose/mongoose.module';
 
 const modules = [ConfigModule, LoggerModule, CacheModule];
 const providers: ClassProvider[] = [];
@@ -17,7 +18,7 @@ const filters: ClassProvider[] = [];
 
 @Global()
 @Module({
-  imports: [TypeOrmModule.forRoot(), ...modules],
+  imports: [TypeOrmModule.forRoot(), MongooseModule.forRoot(), ...modules],
   providers: [...providers, ...interceptors, ...filters],
   exports: [...modules, ...providers],
 })

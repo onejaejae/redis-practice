@@ -18,6 +18,10 @@ export const configurations = (): Configurations => {
       DB_DATABASE: process.env.DB_DATABASE || '',
       DB_PORT: process.env.DB_PORT || 5432,
     },
+    MONGODB: {
+      MONGODB_URI: process.env.MONGODB_URI || '',
+      MONGODB_DATABASE: process.env.MONGODB_DATABASE || '',
+    },
     REDIS: {
       HOST: process.env.REDIS_HOST || '',
       PORT: process.env.REDIS_PORT || 6379,

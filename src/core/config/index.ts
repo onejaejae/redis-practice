@@ -26,8 +26,14 @@ export interface DBConfig {
   DB_PORT: number | string;
 }
 
+export interface MongoDBConfig {
+  MONGODB_URI: string;
+  MONGODB_DATABASE: string;
+}
+
 export interface Configurations {
   APP: AppConfig;
   DB: DBConfig;
+  MONGODB: MongoDBConfig;
   REDIS: RedisConfig;
 }
