@@ -7,12 +7,13 @@ import { TypeOrmModule } from './database/typeorm/typeorm.module';
 import { LoggerModule } from './logger/logger.module';
 import { CacheModule } from './cache/cache.module';
 import { MongooseModule } from './database/mongoose/mongoose.module';
+import { LogModule } from 'src/modules/log/log.module';
 
-const modules = [ConfigModule, LoggerModule, CacheModule];
+const modules = [ConfigModule, LoggerModule, CacheModule, LogModule];
 const providers: ClassProvider[] = [];
 const interceptors: ClassProvider[] = [
-  { provide: APP_INTERCEPTOR, useClass: ApiResponseInterceptor },
   { provide: APP_INTERCEPTOR, useClass: ErrorInterceptor },
+  { provide: APP_INTERCEPTOR, useClass: ApiResponseInterceptor },
 ];
 const filters: ClassProvider[] = [];
 

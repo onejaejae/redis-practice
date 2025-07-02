@@ -2,10 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { LogRepository } from './repository/log.repository';
 import { LogLevels } from 'src/schemas/log/log.interface';
 import { Log } from 'src/schemas/log/log.schema';
+import { LoggerService } from 'src/core/logger/logger.service';
 
 @Injectable()
 export class LogService {
-  constructor(private readonly logRepository: LogRepository) {}
+  constructor(
+    private readonly logRepository: LogRepository,
+    private loggerService: LoggerService,
+  ) {}
 
   async createLog(
     level: LogLevels,
@@ -25,11 +29,11 @@ export class LogService {
       const logModel = Log.toInstance(logObj);
       await this.logRepository.create(logModel);
     } catch (error) {
-      this.createLog(LogLevels.ERROR, error.message, requestId, context, {
-        message: error.message,
-        stack: error.stack,
-        code: error.code,
-      });
+      this.loggerService.error(
+        this.createLog.name,
+        error,
+        'Failed to create log',
+      );
     }
   }
 }

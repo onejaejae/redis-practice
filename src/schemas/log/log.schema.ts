@@ -5,12 +5,12 @@ import { LogLevels } from './log.interface';
 
 export type LogDocument = Log & Document;
 
-@Schema({ timestamps: true, versionKey: false })
+@Schema({ timestamps: true, versionKey: false, collection: 'logs' })
 export class Log {
   @Prop({
     type: String,
     required: true,
-    enum: LogLevels,
+    enum: Object.values(LogLevels),
   })
   level: LogLevels;
 
@@ -31,8 +31,13 @@ export class Log {
 
   @Prop({ type: Object })
   context: {
+    callClass?: string;
+    callMethod?: string;
     method: string;
     url: string;
+    body?: any;
+    query?: any;
+    params?: any;
   };
 
   static toInstance(log: Partial<Log>): Log {

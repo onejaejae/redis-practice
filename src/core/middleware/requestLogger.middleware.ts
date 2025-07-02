@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable, NestMiddleware } from '@nestjs/common';
+import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { LogService } from 'src/modules/log/log.service';
 import { LogLevels } from 'src/schemas/log/log.interface';
@@ -8,6 +8,18 @@ import { v4 as uuidv4 } from 'uuid';
 export class RequestLoggerMiddleware implements NestMiddleware {
   constructor(private readonly logService: LogService) {}
 
+  private createLog(
+    requestId: string,
+    message: string,
+    method: string,
+    url: string,
+  ) {
+    this.logService.createLog(LogLevels.INFO, message, requestId, {
+      method,
+      url,
+    });
+  }
+
   async use(req: Request, res: Response, next: NextFunction): Promise<void> {
     const requestId = req.headers['x-request-id']?.at(0) || uuidv4();
     req.headers['x-request-id'] = requestId;
@@ -15,14 +27,11 @@ export class RequestLoggerMiddleware implements NestMiddleware {
 
     const { method, originalUrl } = req;
 
-    await this.logService.createLog(
-      LogLevels.INFO,
-      `Start Request: ${method} ${originalUrl}`,
+    await this.createLog(
       requestId,
-      {
-        method,
-        url: originalUrl,
-      },
+      `Start Request: ${method} ${originalUrl}`,
+      method,
+      originalUrl,
     );
 
     res.on('finish', async () => {
@@ -39,19 +48,11 @@ export class RequestLoggerMiddleware implements NestMiddleware {
     statusCode: number,
   ): Promise<void> {
     try {
-      const level =
-        statusCode >= HttpStatus.INTERNAL_SERVER_ERROR
-          ? LogLevels.ERROR
-          : LogLevels.INFO;
-
-      await this.logService.createLog(
-        level,
-        `Finish Response: ${method} ${url} with status ${statusCode}`,
+      await this.createLog(
         requestId,
-        {
-          method,
-          url,
-        },
+        `Finish Response: ${method} ${url} with status ${statusCode}`,
+        method,
+        url,
       );
     } catch (error) {
       console.error('Response logging failed:', error);
