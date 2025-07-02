@@ -1,9 +1,72 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { plainToInstance } from 'class-transformer';
+import { plainToInstance, Transform } from 'class-transformer';
 import { Document } from 'mongoose';
 import { LogLevels } from './log.interface';
+import { IsString } from 'class-validator';
 
 export type LogDocument = Log & Document;
+
+class LogError {
+  @Prop({
+    type: String,
+    required: true,
+    maxlength: 1000,
+  })
+  @Transform(({ value }) => value?.substring(0, 1000))
+  message: string;
+
+  @Prop({
+    type: String,
+    maxlength: 10000,
+  })
+  @Transform(({ value }) => value?.substring(0, 10000))
+  stack?: string;
+
+  @Prop({ type: String })
+  name?: string;
+}
+
+class LogContext {
+  @Prop({ type: String })
+  callClass?: string; // 호출된 클래스명
+
+  @Prop({ type: String })
+  callMethod?: string; // 호출된 메서드명
+
+  @Prop({
+    type: String,
+    required: true,
+  })
+  method: string; // HTTP 메서드
+
+  @Prop({
+    type: String,
+    required: true,
+    maxlength: 1000,
+  })
+  @Transform(({ value }) => value?.substring(0, 1000))
+  url: string; // 요청 URL
+
+  @Prop({ type: Number })
+  statusCode?: number; // HTTP 상태 코드
+
+  @Prop({ type: Object })
+  body?: any; // 요청 바디
+
+  @Prop({ type: Object })
+  query?: Record<string, any>; // 쿼리 파라미터
+
+  @Prop({ type: String })
+  @IsString()
+  userAgent?: string; // User-Agent
+
+  @Prop({ type: String })
+  @IsString()
+  ip?: string; // 클라이언트 IP
+
+  @Prop({ type: Number })
+  duration?: number; // 요청 처리 시간 (ms)
+}
 
 @Schema({ timestamps: true, versionKey: false, collection: 'logs' })
 export class Log {
@@ -22,23 +85,11 @@ export class Log {
   requestId: string; // 요청 ID (UUID 형식)
 
   // 에러 정보를 위한 전용 필드
-  @Prop({ type: Object })
-  error?: {
-    message: string;
-    stack: string;
-    code?: string;
-  };
+  @Prop({ type: LogError })
+  error: LogError;
 
-  @Prop({ type: Object })
-  context: {
-    callClass?: string;
-    callMethod?: string;
-    method: string;
-    url: string;
-    body?: any;
-    query?: any;
-    params?: any;
-  };
+  @Prop({ type: LogContext })
+  context: LogContext;
 
   static toInstance(log: Partial<Log>): Log {
     return plainToInstance(Log, log);

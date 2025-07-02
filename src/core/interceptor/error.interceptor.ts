@@ -29,7 +29,6 @@ export class ErrorInterceptor implements NestInterceptor {
     const url = context.switchToHttp().getRequest().url;
     const body = context.switchToHttp().getRequest().body;
     const query = context.switchToHttp().getRequest().query;
-    const params = context.switchToHttp().getRequest().params;
 
     await this.logService.createLog(
       LogLevels.ERROR,
@@ -42,12 +41,11 @@ export class ErrorInterceptor implements NestInterceptor {
         url,
         body,
         query,
-        params,
+        statusCode,
       },
       {
         message: err.message,
         stack: err.stack || '',
-        code: statusCode.toString(),
       },
     );
   }

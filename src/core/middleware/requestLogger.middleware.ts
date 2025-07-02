@@ -2,6 +2,7 @@ import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { LogService } from 'src/modules/log/log.service';
 import { LogLevels } from 'src/schemas/log/log.interface';
+import { Log } from 'src/schemas/log/log.schema';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
@@ -11,51 +12,43 @@ export class RequestLoggerMiddleware implements NestMiddleware {
   private createLog(
     requestId: string,
     message: string,
-    method: string,
-    url: string,
+    context: Log['context'],
   ) {
-    this.logService.createLog(LogLevels.INFO, message, requestId, {
-      method,
-      url,
-    });
+    this.logService.createLog(LogLevels.INFO, message, requestId, context);
   }
 
   async use(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const startTime = Date.now();
     const requestId = req.headers['x-request-id']?.at(0) || uuidv4();
     req.headers['x-request-id'] = requestId;
     res.setHeader('X-Request-ID', requestId);
 
-    const { method, originalUrl } = req;
+    const { method, originalUrl, body, query, ip } = req;
+    const userAgent = req.headers['user-agent'];
 
-    await this.createLog(
-      requestId,
-      `Start Request: ${method} ${originalUrl}`,
+    await this.createLog(requestId, `Start Request: ${method} ${originalUrl}`, {
+      url: originalUrl,
       method,
-      originalUrl,
-    );
+      body,
+      query,
+      ip,
+      userAgent,
+    });
 
     res.on('finish', async () => {
-      await this.logResponse(requestId, method, originalUrl, res.statusCode);
+      const duration = Date.now() - startTime;
+      await this.createLog(
+        requestId,
+        `Finish Request: ${method} ${originalUrl} with status ${res.statusCode}`,
+        {
+          method,
+          url: originalUrl,
+          statusCode: res.statusCode,
+          duration,
+        },
+      );
     });
 
     next();
-  }
-
-  private async logResponse(
-    requestId: string,
-    method: string,
-    url: string,
-    statusCode: number,
-  ): Promise<void> {
-    try {
-      await this.createLog(
-        requestId,
-        `Finish Response: ${method} ${url} with status ${statusCode}`,
-        method,
-        url,
-      );
-    } catch (error) {
-      console.error('Response logging failed:', error);
-    }
   }
 }
