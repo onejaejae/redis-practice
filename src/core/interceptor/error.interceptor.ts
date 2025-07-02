@@ -46,6 +46,7 @@ export class ErrorInterceptor implements NestInterceptor {
       {
         message: err.message,
         stack: err.stack || '',
+        name: err.name,
       },
     );
   }

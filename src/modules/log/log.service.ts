@@ -3,13 +3,19 @@ import { LogRepository } from './repository/log.repository';
 import { LogLevels } from 'src/schemas/log/log.interface';
 import { Log } from 'src/schemas/log/log.schema';
 import { LoggerService } from 'src/core/logger/logger.service';
+import { MoinConfigService } from 'src/core/config/config.service';
 
 @Injectable()
 export class LogService {
+  private readonly serviceName: string;
+
   constructor(
     private readonly logRepository: LogRepository,
     private loggerService: LoggerService,
-  ) {}
+    private configService: MoinConfigService,
+  ) {
+    this.serviceName = this.configService.getAppConfig().NAME;
+  }
 
   async createLog(
     level: LogLevels,
@@ -20,6 +26,7 @@ export class LogService {
   ): Promise<void> {
     try {
       const logObj = {
+        serviceName: this.serviceName,
         level,
         message,
         requestId,
