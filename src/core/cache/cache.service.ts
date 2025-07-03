@@ -18,7 +18,7 @@ export class CacheService {
     return null;
   }
 
-  public async set(key: string, value: any, ttl?: number) {
+  public async set(key: string, value: string | Buffer | number, ttl?: number) {
     const serializedValue = JSON.stringify(value);
 
     await this.redis.set(key, serializedValue);
