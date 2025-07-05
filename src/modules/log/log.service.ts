@@ -21,7 +21,7 @@ export class LogService {
     level: LogLevels,
     message: string,
     requestId: string,
-    context: Log['context'],
+    context?: Log['context'],
     error?: Log['error'],
   ): Promise<void> {
     try {
