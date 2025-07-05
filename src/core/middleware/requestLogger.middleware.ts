@@ -3,11 +3,14 @@ import { Request, Response, NextFunction } from 'express';
 import { LogService } from 'src/modules/log/log.service';
 import { LogLevels } from 'src/schemas/log/log.interface';
 import { Log } from 'src/schemas/log/log.schema';
-import { v4 as uuidv4 } from 'uuid';
+import { RequestContextService } from '../cls/cls.service';
 
 @Injectable()
 export class RequestLoggerMiddleware implements NestMiddleware {
-  constructor(private readonly logService: LogService) {}
+  constructor(
+    private readonly logService: LogService,
+    private readonly requestContextService: RequestContextService,
+  ) {}
 
   private createLog(
     requestId: string,
@@ -19,7 +22,7 @@ export class RequestLoggerMiddleware implements NestMiddleware {
 
   async use(req: Request, res: Response, next: NextFunction): Promise<void> {
     const startTime = Date.now();
-    const requestId = req.headers['x-request-id']?.at(0) || uuidv4();
+    const requestId = this.requestContextService.getRequestId();
     req.headers['x-request-id'] = requestId;
     res.setHeader('X-Request-ID', requestId);
 

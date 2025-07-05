@@ -36,17 +36,15 @@ class LogContext {
 
   @Prop({
     type: String,
-    required: true,
+    required: false,
   })
-  method: string; // HTTP 메서드
+  method?: string; // HTTP 메서드
 
   @Prop({
     type: String,
-    required: true,
-    maxlength: 1000,
+    required: false,
   })
-  @Transform(({ value }) => value?.substring(0, 1000))
-  url: string; // 요청 URL
+  url?: string; // 요청 URL
 
   @Prop({ type: Number })
   statusCode?: number; // HTTP 상태 코드
