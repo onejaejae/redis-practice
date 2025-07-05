@@ -4,6 +4,7 @@ import {
   AppConfig,
   Configurations,
   DBConfig,
+  JwtConfig,
   MongoDBConfig,
   RedisConfig,
 } from '.';
@@ -26,5 +27,9 @@ export class MoinConfigService {
 
   getRedisConfig(): RedisConfig {
     return this.configService.getOrThrow('REDIS');
+  }
+
+  getJwtConfig(): JwtConfig {
+    return this.configService.getOrThrow('JWT');
   }
 }
