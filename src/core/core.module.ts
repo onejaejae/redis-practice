@@ -1,4 +1,9 @@
-import { ClassProvider, Global, Module } from '@nestjs/common';
+import {
+  ClassProvider,
+  Global,
+  MiddlewareConsumer,
+  Module,
+} from '@nestjs/common';
 import { ConfigModule } from './config/config.module';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ApiResponseInterceptor } from './interceptor/apiResponse.interceptor';
@@ -11,8 +16,18 @@ import { LogModule } from 'src/modules/log/log.module';
 import { JwtModule } from './jwt/jwt.module';
 import { JwtBlacklistGuard } from './guard/jwtBlacklist.guard';
 import { AccessTokenGuard } from './guard/accessToken.guard';
+import { ClsMiddleware } from 'nestjs-cls';
+import { RequestLoggerMiddleware } from './middleware/requestLogger.middleware';
+import { ClsModule } from './cls/cls.module';
 
-const modules = [ConfigModule, LoggerModule, CacheModule, LogModule, JwtModule];
+const modules = [
+  ConfigModule,
+  LoggerModule,
+  CacheModule,
+  LogModule,
+  JwtModule,
+  ClsModule,
+];
 const providers: ClassProvider[] = [];
 const interceptors: ClassProvider[] = [
   { provide: APP_INTERCEPTOR, useClass: ErrorInterceptor },
@@ -36,4 +51,12 @@ const filters: ClassProvider[] = [];
   providers: [...providers, ...interceptors, ...filters, ...guards],
   exports: [...modules, ...providers],
 })
-export class CoreModule {}
+export class CoreModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(ClsMiddleware)
+      .forRoutes('*')
+      .apply(RequestLoggerMiddleware)
+      .forRoutes('*');
+  }
+}
