@@ -4,6 +4,7 @@ import { LogLevels } from 'src/schemas/log/log.interface';
 import { Log } from 'src/schemas/log/log.schema';
 import { LoggerService } from 'src/core/logger/logger.service';
 import { MoinConfigService } from 'src/core/config/config.service';
+import { LogProducerService } from 'src/core/queue/producers/log.producer';
 
 @Injectable()
 export class LogService {
@@ -13,6 +14,7 @@ export class LogService {
     private readonly logRepository: LogRepository,
     private loggerService: LoggerService,
     private configService: MoinConfigService,
+    private logProducerService: LogProducerService,
   ) {
     this.serviceName = this.configService.getAppConfig().NAME;
   }
@@ -26,15 +28,14 @@ export class LogService {
   ): Promise<void> {
     try {
       const logObj = {
-        serviceName: this.serviceName,
         level,
         message,
         requestId,
         context,
         error,
+        serviceName: this.serviceName,
       };
-      const logModel = Log.toInstance(logObj);
-      await this.logRepository.create(logModel);
+      await this.logProducerService.addLogJob(logObj);
     } catch (error) {
       this.loggerService.error(
         this.createLog.name,
