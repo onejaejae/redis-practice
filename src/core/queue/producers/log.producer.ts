@@ -13,16 +13,21 @@ export class LogProducerService {
   ) {}
 
   async addLogJob(jobData: ILogJobData): Promise<void> {
-    await this.logQueue.add(JOB_NAMES.CREATE_LOG, jobData, {
-      attempts: 3,
-      backoff: {
-        type: 'exponential',
-        delay: 2000,
-      },
-      removeOnComplete: 100,
-      removeOnFail: 50,
-    });
+    try {
+      await this.logQueue.add(JOB_NAMES.CREATE_LOG, jobData, {
+        attempts: 3,
+        backoff: {
+          type: 'exponential',
+          delay: 2000,
+        },
+        removeOnComplete: 100,
+        removeOnFail: 50,
+      });
 
-    this.loggerService.info(this.addLogJob.name, jobData, 'Log job added');
+      this.loggerService.info(this.addLogJob.name, jobData, 'Log job added');
+    } catch (error) {
+      this.loggerService.error(this.addLogJob.name, error, 'Log job failed');
+      throw error;
+    }
   }
 }

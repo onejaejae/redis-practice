@@ -16,7 +16,7 @@ export class LogConsumerService extends WorkerHost {
 
   async process(job: Job<ILogJobData>): Promise<void> {
     try {
-      this.loggerService.info(this.process.name, job, 'Log job started');
+      this.loggerService.info(this.process.name, job, 'Log job consumed');
 
       switch (job.name) {
         case JOB_NAMES.CREATE_LOG:
@@ -48,7 +48,7 @@ export class LogConsumerService extends WorkerHost {
     this.loggerService.info(
       this.handleCreateLog.name,
       logModel,
-      'Log job created',
+      'Log job created successfully',
     );
   }
 }
