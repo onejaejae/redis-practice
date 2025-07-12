@@ -4,14 +4,20 @@ import { QUEUE_NAMES } from './queue.interface';
 import { LogConsumerService } from './consumers/log.consumer';
 import { LogProducerService } from './producers/log.producer';
 import { LogRepositoryModule } from 'src/modules/log/repository/log-repository.module';
+import { ConfigModule } from '../config/config.module';
+import { MoinConfigService } from '../config/config.service';
 
 @Module({
   imports: [
-    BullModule.forRoot({
-      connection: {
-        host: 'localhost',
-        port: 6379,
-      },
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: MoinConfigService) => ({
+        connection: {
+          host: configService.getRedisConfig().HOST,
+          port: Number(configService.getRedisConfig().PORT),
+        },
+      }),
+      inject: [MoinConfigService],
     }),
     BullModule.registerQueue({
       name: QUEUE_NAMES.LOG_QUEUE,
