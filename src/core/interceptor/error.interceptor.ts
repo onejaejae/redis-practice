@@ -10,10 +10,14 @@ import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { LogService } from 'src/modules/log/log.service';
 import { LogLevels } from 'src/schemas/log/log.interface';
+import { LoggerService } from '../logger/logger.service';
 
 @Injectable()
 export class ErrorInterceptor implements NestInterceptor {
-  constructor(private readonly logService: LogService) {}
+  constructor(
+    private readonly logService: LogService,
+    private readonly winstonLogger: LoggerService,
+  ) {}
 
   private async createLog(
     context: ExecutionContext,
@@ -30,6 +34,18 @@ export class ErrorInterceptor implements NestInterceptor {
     const body = context.switchToHttp().getRequest().body;
     const query = context.switchToHttp().getRequest().query;
 
+    this.winstonLogger.error(
+      `Error: ${method} ${url}, ${callClass}.${callMethod}, ${err.message}`,
+      {
+        callClass,
+        callMethod,
+        method,
+        url,
+        body,
+        query,
+        statusCode,
+      },
+    );
     await this.logService.createLog(
       LogLevels.ERROR,
       `Error: ${method} ${url}, ${callClass}.${callMethod}, ${err.message}`,

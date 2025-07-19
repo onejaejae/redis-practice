@@ -38,10 +38,15 @@ export interface JwtConfig {
   JWT_REFRESH_EXPIRATION: string;
 }
 
+export interface LokiConfig {
+  LOKI_HOST: string;
+}
+
 export interface Configurations {
   APP: AppConfig;
   DB: DBConfig;
   MONGODB: MongoDBConfig;
   REDIS: RedisConfig;
   JWT: JwtConfig;
+  LOKI: LokiConfig;
 }
