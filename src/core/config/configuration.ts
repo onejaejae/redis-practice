@@ -32,5 +32,8 @@ export const configurations = (): Configurations => {
       JWT_ACCESS_EXPIRATION: process.env.JWT_ACCESS_EXPIRATION || '',
       JWT_REFRESH_EXPIRATION: process.env.JWT_REFRESH_EXPIRATION || '',
     },
+    LOKI: {
+      LOKI_HOST: process.env.LOKI_HOST || '',
+    },
   };
 };

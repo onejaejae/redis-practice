@@ -5,6 +5,7 @@ import {
   Configurations,
   DBConfig,
   JwtConfig,
+  LokiConfig,
   MongoDBConfig,
   RedisConfig,
 } from '.';
@@ -31,5 +32,9 @@ export class MoinConfigService {
 
   getJwtConfig(): JwtConfig {
     return this.configService.getOrThrow('JWT');
+  }
+
+  getLokiConfig(): LokiConfig {
+    return this.configService.getOrThrow('LOKI');
   }
 }

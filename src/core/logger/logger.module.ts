@@ -4,6 +4,7 @@ import winston from 'winston';
 import { LoggerService } from './logger.service';
 import { MoinConfigService } from '../config/config.service';
 import { Env } from '../config';
+import LokiTransport from 'winston-loki';
 
 @Global()
 @Module({
@@ -13,6 +14,7 @@ import { Env } from '../config';
       useFactory: (configsService: MoinConfigService) => {
         const { ENV, NAME } = configsService.getAppConfig();
         const isDeployedEnv = ENV !== Env.local && ENV !== Env.test;
+        const lokiConfig = configsService.getLokiConfig();
 
         if (isDeployedEnv) {
           return {
@@ -31,6 +33,10 @@ import { Env } from '../config';
                   colors: true,
                 }),
               ),
+            }),
+            new LokiTransport({
+              host: lokiConfig.LOKI_HOST, // Loki 서버 URL
+              labels: { app: `${ENV}-${NAME}` }, // 로그 라벨 설정
             }),
           ],
         };
